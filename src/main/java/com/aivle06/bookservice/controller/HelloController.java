@@ -23,14 +23,14 @@ public class HelloController {
     }
 
     // 전체 목록 조회 (GET /api/books/?page={page_num})
-    @GetMapping("/?page={page_num}")
-    public ResponseEntity<List<Book>> getAllBooks() {
+    @GetMapping()
+    public ResponseEntity<List<Book>> getAllBooks(@RequestParam("page")int page) {
         List<Book> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
     }
 
     // 특정 ID로 조회 (GET /api/books/{book_id})
-    @GetMapping("/{book_id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
         Book book = bookService.getBookById(id);
         return ResponseEntity.ok(book);
@@ -45,7 +45,7 @@ public class HelloController {
     }
 
     // 삭제 (DELETE /api/books/{id})
-    @DeleteMapping("/{book_id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
