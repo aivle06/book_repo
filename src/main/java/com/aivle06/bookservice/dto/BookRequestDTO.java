@@ -12,6 +12,20 @@ import lombok.NoArgsConstructor;
 public class BookRequestDTO {
 
     // 책 등록
-    static class c
+    public static class Create{
+        String title;
+        String content;
+        String author;
+
+    }
+
+    // 책 수정
+    public static class Update{
+        String title;
+        String content;
+        String author;
+    }
+
+
 
 }
