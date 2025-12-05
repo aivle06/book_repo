@@ -1,6 +1,7 @@
 package com.aivle06.bookservice.service;
 
 import com.aivle06.bookservice.domain.Book;
+import com.aivle06.bookservice.exception.ResourceNotFoundException;
 import com.aivle06.bookservice.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class BookServiceImpl implements BookService{
     @Override
     @Transactional(readOnly = true)
     public Book getBookById(Long id){
-        return bookRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("책이 존재하지 않습니다."));
+        return bookRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("책이 존재하지 않습니다."));
     }
 
     //업데이트
