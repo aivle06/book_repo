@@ -29,14 +29,14 @@ public class HelloController {
         return ResponseEntity.ok(books);
     }
 
-    // 특정 ID로 조회 (GET /api/books/{book_id})
+    // 특정 ID로 조회 (GET /api/books/{id})
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
         Book book = bookService.getBookById(id);
         return ResponseEntity.ok(book);
     }
 
-    // 업뎃 (PUT /api/books/{book_id})
+    // 업뎃 (PUT /api/books/{id})
     @PutMapping("/{id}")
     public ResponseEntity<Book> updateBook(@PathVariable Long id,
                                            @RequestBody Book book) {
