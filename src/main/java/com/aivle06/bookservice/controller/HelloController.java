@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
-@RequestMapping
+@RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class HelloController {
 
@@ -23,20 +23,20 @@ public class HelloController {
     }
 
     // 전체 목록 조회 (GET /api/books/?page={page_num})
-    @GetMapping
+    @GetMapping("/?page={page_num}")
     public ResponseEntity<List<Book>> getAllBooks() {
         List<Book> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
     }
 
     // 특정 ID로 조회 (GET /api/books/{book_id})
-    @GetMapping("/{id}")
+    @GetMapping("/{book_id}")
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
         Book book = bookService.getBookById(id);
         return ResponseEntity.ok(book);
     }
 
-    // 업뎃 (PUT /api/books/{id})
+    // 업뎃 (PUT /api/books/{book_id})
     @PutMapping("/{id}")
     public ResponseEntity<Book> updateBook(@PathVariable Long id,
                                            @RequestBody Book book) {
@@ -45,7 +45,7 @@ public class HelloController {
     }
 
     // 삭제 (DELETE /api/books/{id})
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{book_id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
