@@ -29,6 +29,7 @@ public class BookRequestDTO {
         String title;
         String content;
         String author;
+        String image_url;
     }
 
 
