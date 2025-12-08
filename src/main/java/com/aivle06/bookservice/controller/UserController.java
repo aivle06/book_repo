@@ -3,7 +3,6 @@ package com.aivle06.bookservice.controller;
 import com.aivle06.bookservice.domain.User;
 import com.aivle06.bookservice.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,30 +16,31 @@ public class UserController {
     //CRUD
     //Create POST
     @PostMapping
-    public ResponseEntity<User> createBook(){
-        User user = new User();
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    public ResponseEntity<User> createUser(@RequestBody User user){
+        User createdUser = userService.createUser(user);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     //Read GET
-    @GetMapping("/{user_id}")
+    @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id){
         User user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
     //Update PUT
-    @PutMapping("/{user_id}")
+    @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(
-            @PathVariable Long id, User user
+            @PathVariable Long id,
+            @RequestBody User user
     ){
         User updatedUser = userService.updateUser(id, user);
         return ResponseEntity.ok(updatedUser);
     }
 
     //Delete DELETE
-    @DeleteMapping("/{user_id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
