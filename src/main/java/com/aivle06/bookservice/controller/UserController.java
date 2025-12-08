@@ -23,13 +23,23 @@ public class UserController {
     }
 
     //Read GET
-//    @GetMapping("/{user_id}")
-//    public ResponseEntity<User>
+    @GetMapping("/{user_id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id){
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
 
     //Update PUT
+    @PutMapping("/{user_id}")
+    public ResponseEntity<User> updateUser(
+            @PathVariable Long id, User user
+    ){
+        User updatedUser = userService.updateUser(id, user);
+        return ResponseEntity.ok(updatedUser);
+    }
 
     //Delete DELETE
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{user_id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
