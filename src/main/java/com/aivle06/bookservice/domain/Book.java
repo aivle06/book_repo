@@ -1,5 +1,6 @@
 package com.aivle06.bookservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,7 +38,14 @@ public class Book {
 
     @Column(columnDefinition = "TEXT")
     private String image_url;
+
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name="user_id")
+    private User user;
     //
     //
+
+
 
 }
