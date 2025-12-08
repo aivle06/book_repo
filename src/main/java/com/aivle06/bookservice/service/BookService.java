@@ -4,6 +4,7 @@ import com.aivle06.bookservice.domain.Book;
 import com.aivle06.bookservice.dto.BookDetailResponseDTO;
 import com.aivle06.bookservice.dto.BookListResponseDTO;
 import com.aivle06.bookservice.dto.BookRequestDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface BookService {
     BookListResponseDTO getBookListResponseDTOById(Long id);
 
     // 다건 리스트 Response용 + 페이징
-    List<BookListResponseDTO> getAllBookListResponseWithPaging(int page, int size);
+    Page<BookListResponseDTO> getAllBookListResponseWithPaging(int page, int size);
 
     // 책 상세정보 Response용
     BookDetailResponseDTO getBookDetailResponseDTOById(Long id);
