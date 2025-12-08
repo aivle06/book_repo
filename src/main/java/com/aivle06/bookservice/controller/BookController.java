@@ -7,6 +7,7 @@ import com.aivle06.bookservice.dto.BookRequestDTO;
 import com.aivle06.bookservice.dto.common.DataResponse;
 import com.aivle06.bookservice.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,16 @@ public class BookController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        DataResponse<BookListResponseDTO> response = new DataResponse<>(bookService.getAllBookListResponseWithPaging(page, size));
+        Page<BookListResponseDTO> result = bookService.getAllBookListResponseWithPaging(page, size);
+
+        DataResponse<BookListResponseDTO> response = DataResponse.<BookListResponseDTO>builder()
+                .data(result.getContent())      // 현재 페이지의 데이터
+                .totalPages(result.getTotalPages())
+                .totalElements(result.getTotalElements())
+                .page(page)
+                .size(size)
+                .build();
+
         return ResponseEntity.ok(response);
     }
 
