@@ -10,7 +10,6 @@ import com.aivle06.bookservice.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,13 +52,11 @@ public class BookServiceImpl implements BookService{
     }
 
     // 페이 적용 리스트 Response
-    public List<BookListResponseDTO> getAllBookListResponseWithPaging(int page, int size) {
+    public Page<BookListResponseDTO> getAllBookListResponseWithPaging(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
         Page<Book> result = bookRepository.findAll(pageable);
 
-        return result.stream()
-                .map(bookMapper::toListResponseDTO)
-                .toList();
+        return result.map(bookMapper::toListResponseDTO);
     }
 
 
