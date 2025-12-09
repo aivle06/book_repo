@@ -25,7 +25,13 @@ public class User {
     @Column(name= "user_id")
     private Long id;
 
+    @Column(nullable = false)
+    private String pw;
+
     private String name;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @CreationTimestamp
     private LocalDateTime member_since;

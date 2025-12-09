@@ -46,12 +46,14 @@ public class BookServiceImpl implements BookService{
 
     // 리스트 Response용
     @Override
+    @Transactional(readOnly = true)
     public BookListResponseDTO getBookListResponseDTOById(Long id){
         Book bookById = getBookById(id);
         return bookMapper.toListResponseDTO(bookById);
     }
 
     // 페이 적용 리스트 Response
+    @Transactional(readOnly = true)
     public Page<BookListResponseDTO> getAllBookListResponseWithPaging(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
         Page<Book> result = bookRepository.findAll(pageable);
@@ -61,6 +63,7 @@ public class BookServiceImpl implements BookService{
 
 
     // 책 상세정보 Response용
+    @Transactional(readOnly = true)
     public BookDetailResponseDTO getBookDetailResponseDTOById(Long id){
         Book bookById = getBookById(id);
         return bookMapper.toDetailResponseDTO(bookById);
@@ -75,6 +78,7 @@ public class BookServiceImpl implements BookService{
     }
 
     //삭제
+    @Override
     public void deleteBook(Long id){
         Book b = getBookById(id);
         bookRepository.delete(b);
