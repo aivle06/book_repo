@@ -22,10 +22,16 @@ public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name= "user_id")
+    @Column(name= "user_id", nullable = false)
     private Long id;
 
+    @Column(nullable = false)
+    private String pw;
+
     private String name;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @CreationTimestamp
     private LocalDateTime member_since;
