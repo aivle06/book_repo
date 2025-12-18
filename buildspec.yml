@@ -6,11 +6,13 @@ phases:
       java: corretto17
     commands:
       - chmod +x ./gradlew
-      - ./gradlew --version
   build:
     commands:
       - ./gradlew clean build -x test
       - ls -la build/libs
+
 artifacts:
   files:
     - build/libs/*.jar
+    - appspec.yml
+    - scripts/**/*
