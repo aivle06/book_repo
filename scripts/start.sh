@@ -17,5 +17,5 @@ fi
 JAR_NAME=$(ls -tr *.jar | tail -n 1)
 echo "> 새 애플리케이션 배포: $JAR_NAME"
 
-# 로그를 남기며 백그라운드 실행
-nohup java -jar $JAR_NAME > /home/ec2-user/app/nohup.out 2>&1 &
+# [수정된 부분] 표준 입력을 /dev/null로 리다이렉트하여 CodeDeploy 연결 해제
+nohup java -jar $JAR_NAME > /home/ec2-user/app/nohup.out 2>&1 < /dev/null &
