@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-# Ensure user exists (idempotent)
-if ! id -u bookapp >/dev/null 2>&1; then
-  useradd -r -s /sbin/nologin bookapp
-fi
+# Ensure user exists
+id -u bookapp >/dev/null 2>&1 || useradd -r -s /sbin/nologin bookapp
 
-# Ensure systemd unit exists (idempotent)
+# Ensure systemd unit exists
 if [ ! -f /etc/systemd/system/bookapp.service ]; then
   cat >/etc/systemd/system/bookapp.service <<'EOF'
 [Unit]
@@ -23,16 +21,16 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 EOF
-
   systemctl daemon-reload
   systemctl enable bookapp.service
 fi
 
-# Find jar (more flexible than only build/libs)
-JAR="$(ls -1t /opt/book_repo/**/*.jar /opt/book_repo/*.jar 2>/dev/null | head -n 1 || true)"
+# Find newest jar excluding app.jar
+JAR="$(find /opt/book_repo -type f -name "*.jar" ! -name "app.jar" -printf "%T@ %p\n" 2>/dev/null \
+  | sort -nr | head -n 1 | cut -d' ' -f2- || true)"
+
 if [ -z "$JAR" ]; then
-  echo "Jar not found under /opt/book_repo"
-  echo "Contents of /opt/book_repo:"
+  echo "Jar not found under /opt/book_repo (excluding app.jar)"
   ls -R /opt/book_repo | head -n 200
   exit 1
 fi
