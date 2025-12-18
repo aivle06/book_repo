@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-set -env
+set -e
 
-id -u bookapp &>/dev/null || useradd -r -s /sbin/nologin bookapp
+id -u bookapp >/dev/null 2>&1 || useradd -r -s /sbin/nologin bookapp
 
 mkdir -p /opt/book_repo
-chown -R bookapp:bookapp /opt/book_repo
+chown -R bookapp:bookapp /opt/book_repo || true
 
-# Ensure Java exists (AL2 uses yum; AL2023 uses dnf)
 if ! command -v java >/dev/null 2>&1; then
   if command -v dnf >/dev/null 2>&1; then
     dnf install -y java-17-amazon-corretto-headless
@@ -15,7 +14,6 @@ if ! command -v java >/dev/null 2>&1; then
   fi
 fi
 
-# systemd service
 cat >/etc/systemd/system/bookapp.service <<'EOF'
 [Unit]
 Description=Book Repo Spring Boot API
