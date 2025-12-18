@@ -13,4 +13,6 @@ phases:
 artifacts:
   files:
     - build/libs/*.jar
+    - appspec.yml        # <--- 필수: 배포 설명서
+    - scripts/** # <--- 필수: 아까 수정한 start.sh가 들어있는 폴더
   discard-paths: yes
