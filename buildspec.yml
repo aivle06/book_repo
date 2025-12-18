@@ -12,7 +12,7 @@ phases:
 
 artifacts:
   files:
-    - build/libs/*.jar   # 요리된 음식 (JAR)
-    - appspec.yml        # 필수: 배포 설명서
-    - scripts/** # 필수: 배포 스크립트 폴더
-  # discard-paths: yes  <-- [중요] 이 줄을 반드시 지우거나 주석 처리하세요!
+    - build/libs/*.jar
+    - appspec.yml
+    - scripts/**
+    - src/main/resources/static/** # <--- 이 줄 추가!
