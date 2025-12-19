@@ -1,24 +1,42 @@
-#!/bin/bash
-cd /home/ec2-user/app
+#!/usr/bin/env bash
+set -e
 
-echo "> 현재 실행 중인 애플리케이션 pid 확인"
-CURRENT_PID=$(pgrep -f .jar)
+# Ensure user exists
+id -u bookapp >/dev/null 2>&1 || useradd -r -s /sbin/nologin bookapp
 
-if [ -z "$CURRENT_PID" ]; then
-  echo "> 현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
-else
-  echo "> 실행 중인 애플리케이션 종료 (PID: $CURRENT_PID)"
-  kill -15 $CURRENT_PID
-  sleep 5
+# Ensure systemd unit exists
+if [ ! -f /etc/systemd/system/bookapp.service ]; then
+  cat >/etc/systemd/system/bookapp.service <<'EOF'
+[Unit]
+Description=Book Repo Spring Boot API
+After=network.target
+
+[Service]
+User=bookapp
+WorkingDirectory=/opt/book_repo
+ExecStart=/usr/bin/java -jar /opt/book_repo/app.jar
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  systemctl daemon-reload
+  systemctl enable bookapp.service
 fi
 
-# 기존 로직: 가장 최신 JAR 파일 찾기
-# (폴더 구조가 바뀌었으니 build/libs 까지 내려가서 찾도록 유지)
-JAR_NAME=$(find . -name "*.jar" ! -name "*plain.jar" | tail -n 1)
+# Find newest jar excluding app.jar
+JAR="$(find /opt/book_repo -type f -name "*.jar" ! -name "app.jar" -printf "%T@ %p\n" 2>/dev/null \
+  | sort -nr | head -n 1 | cut -d' ' -f2- || true)"
 
-echo "> 새 애플리케이션 배포: $JAR_NAME"
+if [ -z "$JAR" ]; then
+  echo "Jar not found under /opt/book_repo (excluding app.jar)"
+  ls -R /opt/book_repo | head -n 200
+  exit 1
+fi
 
-chmod +x $JAR_NAME
+cp -f "$JAR" /opt/book_repo/app.jar
+chown bookapp:bookapp /opt/book_repo/app.jar
 
-# nohup으로 실행
-nohup java -jar $JAR_NAME > /home/ec2-user/app/nohup.out 2>&1 < /dev/null &
+systemctl restart bookapp.service
+systemctl status bookapp.service --no-pager -l || true
