@@ -2,9 +2,7 @@
 set -e
 
 id -u bookapp >/dev/null 2>&1 || useradd -r -s /sbin/nologin bookapp
-
 mkdir -p /opt/book_repo
-chown -R bookapp:bookapp /opt/book_repo || true
 
 if ! command -v java >/dev/null 2>&1; then
   if command -v dnf >/dev/null 2>&1; then

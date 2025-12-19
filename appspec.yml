@@ -2,19 +2,21 @@ version: 0.1
 os: linux
 
 files:
-  - source: /
+  - source: build/libs/app.jar
     destination: /opt/book_repo
 
 hooks:
+  ApplicationStop:
+    - location: scripts/stop.sh
+      timeout: 300
+      runas: root
+
   AfterInstall:
     - location: scripts/install.sh
       timeout: 300
       runas: root
+
   ApplicationStart:
     - location: scripts/start.sh
-      timeout: 300
-      runas: root
-  ApplicationStop:
-    - location: scripts/stop.sh
       timeout: 300
       runas: root

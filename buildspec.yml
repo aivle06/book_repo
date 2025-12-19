@@ -9,10 +9,10 @@ phases:
   build:
     commands:
       - ./gradlew clean build -x test
-      - ls -la build/libs
+      - cp build/libs/*jar build/libs/app.jar
 
 artifacts:
   files:
-    - build/libs/*.jar
+    - build/libs/app.jar
     - appspec.yml
     - scripts/**/*
