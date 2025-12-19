@@ -1,42 +1,37 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
-# Ensure user exists
-id -u bookapp >/dev/null 2>&1 || useradd -r -s /sbin/nologin bookapp
+APP_DIR="/home/ec2-user/app"
+LOG_FILE="$APP_DIR/nohup.out"
 
-# Ensure systemd unit exists
-if [ ! -f /etc/systemd/system/bookapp.service ]; then
-  cat >/etc/systemd/system/bookapp.service <<'EOF'
-[Unit]
-Description=Book Repo Spring Boot API
-After=network.target
+cd "$APP_DIR"
 
-[Service]
-User=bookapp
-WorkingDirectory=/opt/book_repo
-ExecStart=/usr/bin/java -jar /opt/book_repo/app.jar
-Restart=always
-RestartSec=5
+echo "> 현재 실행 중인 애플리케이션 pid 확인"
 
-[Install]
-WantedBy=multi-user.target
-EOF
-  systemctl daemon-reload
-  systemctl enable bookapp.service
+CURRENT_PID=$(pgrep -f "java -jar" || true)
+
+if [ -z "$CURRENT_PID" ]; then
+    echo "> 현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
+else
+    echo "> 실행 중인 애플리케이션 종료 (PID: $CURRENT_PID)"
+    kill -15 "$CURRENT_PID"
+    sleep 5
 fi
 
-# Find newest jar excluding app.jar
-JAR="$(find /opt/book_repo -type f -name "*.jar" ! -name "app.jar" -printf "%T@ %p\n" 2>/dev/null \
-  | sort -nr | head -n 1 | cut -d' ' -f2- || true)"
+echo "> 배포할 JAR 파일 탐색"
 
-if [ -z "$JAR" ]; then
-  echo "Jar not found under /opt/book_repo (excluding app.jar)"
-  ls -R /opt/book_repo | head -n 200
-  exit 1
+JAR_NAME=$(find "$APP_DIR" -type f -name "*.jar" ! -name "*plain.jar" -printf "%T@ %p\n" \
+    | sort -nr \
+    | head -n 1 \
+    | cut -d' ' -f2-)
+
+if [ -z "$JAR_NAME" ]; then
+    echo "> JAR 파일을 찾지 못했습니다. 배포 중단"
+    exit 1
 fi
 
-cp -f "$JAR" /opt/book_repo/app.jar
-chown bookapp:bookapp /opt/book_repo/app.jar
+echo "> 새 애플리케이션 배포: $JAR_NAME"
 
-systemctl restart bookapp.service
-systemctl status bookapp.service --no-pager -l || true
+chmod +x "$JAR_NAME"
+
+nohup java -jar "$JAR_NAME" > "$LOG_FILE" 2>&1 < /dev/null &
