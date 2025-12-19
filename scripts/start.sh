@@ -10,28 +10,20 @@ echo "> 현재 실행 중인 애플리케이션 pid 확인"
 
 CURRENT_PID=$(pgrep -f "java -jar" || true)
 
-if [ -z "$CURRENT_PID" ]; then
-    echo "> 현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
-else
-    echo "> 실행 중인 애플리케이션 종료 (PID: $CURRENT_PID)"
-    kill -15 "$CURRENT_PID"
-    sleep 5
+if [ -n "$CURRENT_PID" ]; then
+    echo "> 실행 중인 애플리케이션 즉시 종료 (PID: $CURRENT_PID)"
+    kill -9 $CURRENT_PID
 fi
 
-echo "> 배포할 JAR 파일 탐색"
+echo "> 최신 JAR 파일 탐색 (가장 최근 것 1개)"
 
-JAR_NAME=$(find "$APP_DIR" -type f -name "*.jar" ! -name "*plain.jar" -printf "%T@ %p\n" \
-    | sort -nr \
-    | head -n 1 \
-    | cut -d' ' -f2-)
+JAR_NAME=$(ls -t *.jar 2>/dev/null | grep -v plain | head -n 1)
 
 if [ -z "$JAR_NAME" ]; then
     echo "> JAR 파일을 찾지 못했습니다. 배포 중단"
     exit 1
 fi
 
-echo "> 새 애플리케이션 배포: $JAR_NAME"
+echo "> 새 애플리케이션 즉시 실행: $JAR_NAME"
 
-chmod +x "$JAR_NAME"
-
-nohup java -jar "$JAR_NAME" > "$LOG_FILE" 2>&1 < /dev/null &
+nohup java -jar "$JAR_NAME" > "$LOG_FILE" 2>&1 &
