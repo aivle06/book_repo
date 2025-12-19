@@ -1,18 +1,16 @@
-version: 0.2
-
 phases:
   install:
     runtime-versions:
-      java: corretto17
+      java: 17
     commands:
       - chmod +x ./gradlew
   build:
     commands:
-      - ./gradlew clean build -x test
-      - cp build/libs/*jar build/libs/app.jar
+      - ./gradlew build
 
 artifacts:
   files:
-    - build/libs/app.jar
+    - build/libs/*.jar
     - appspec.yml
-    - scripts/**/*
+    - scripts/**
+    - src/main/resources/static/** # <--- 이 줄 추가!
