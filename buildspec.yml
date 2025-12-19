@@ -11,9 +11,18 @@ phases:
     commands:
       - ./gradlew clean build -x test
 
+  # 🟢 추가된 부분: 파일명 통일
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+      # 버전이 붙은 jar(예: demo-0.0.1.jar)를 app.jar로 이름 변경
+      # (plain.jar 제외하고 실행 가능한 jar만 선택)
+      - mv build/libs/*-SNAPSHOT.jar build/libs/app.jar
+
 artifacts:
   files:
-    - build/libs/*.jar
+    - build/libs/app.jar   # 🟢 *.jar 대신 고정된 이름 사용
     - appspec.yml
-    - scripts/**
-    - src/main/resources/static/**
+    - scripts/** # 🟢 배포 스크립트 포함
+  # 정적 리소스(static)는 JAR 안에 포함되므로 제외했습니다.
+  discard-paths: yes       # (선택) S3 업로드 시 경로 단순화가 필요하면 yes, 구조 유지하려면 no
