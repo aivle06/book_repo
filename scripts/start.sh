@@ -1,29 +1,24 @@
 #!/bin/bash
-set -e
-
-APP_DIR="/home/ec2-user/app"
-LOG_FILE="$APP_DIR/nohup.out"
-
-cd "$APP_DIR"
+cd /home/ec2-user/app
 
 echo "> 현재 실행 중인 애플리케이션 pid 확인"
+CURRENT_PID=$(pgrep -f .jar)
 
-CURRENT_PID=$(pgrep -f "java -jar" || true)
-
-if [ -n "$CURRENT_PID" ]; then
-    echo "> 실행 중인 애플리케이션 즉시 종료 (PID: $CURRENT_PID)"
-    kill -9 $CURRENT_PID
+if [ -z "$CURRENT_PID" ]; then
+  echo "> 현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
+else
+  echo "> 실행 중인 애플리케이션 종료 (PID: $CURRENT_PID)"
+  kill -15 $CURRENT_PID
+  sleep 5
 fi
 
-echo "> 최신 JAR 파일 탐색 (가장 최근 것 1개)"
+# 기존 로직: 가장 최신 JAR 파일 찾기
+# (폴더 구조가 바뀌었으니 build/libs 까지 내려가서 찾도록 유지)
+JAR_NAME=$(find . -name "*.jar" ! -name "*plain.jar" | tail -n 1)
 
-JAR_NAME=$(ls -t *.jar 2>/dev/null | grep -v plain | head -n 1)
+echo "> 새 애플리케이션 배포: $JAR_NAME"
 
-if [ -z "$JAR_NAME" ]; then
-    echo "> JAR 파일을 찾지 못했습니다. 배포 중단"
-    exit 1
-fi
+chmod +x $JAR_NAME
 
-echo "> 새 애플리케이션 즉시 실행: $JAR_NAME"
-
-nohup java -jar "$JAR_NAME" > "$LOG_FILE" 2>&1 &
+# nohup으로 실행
+nohup java -jar $JAR_NAME > /home/ec2-user/app/nohup.out 2>&1 < /dev/null &

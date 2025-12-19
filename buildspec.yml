@@ -9,7 +9,15 @@ phases:
 
   build:
     commands:
-      - ./gradlew clean build -x test
+      - ./gradlew build \
+        --parallel \
+        --build-cache \
+        -x test
+
+cache:
+  paths:
+    - /root/.gradle/caches/**
+    - /root/.gradle/wrapper/**
 
 artifacts:
   files:
