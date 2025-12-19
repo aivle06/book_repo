@@ -1,6 +1,5 @@
-version: 0.1
+version: 0.0
 os: linux
-
 files:
   - source: /
     destination: /home/ec2-user/app
@@ -15,5 +14,5 @@ permissions:
 hooks:
   ApplicationStart:
     - location: scripts/start.sh
-      timeout: 300
+      timeout: 60
       runas: ec2-user
