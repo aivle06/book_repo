@@ -1,43 +1,27 @@
-# 1. 애플리케이션 실제 배포 설정 (Deployment)
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: spring-demo-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: spring-demo
-  template:
-    metadata:
-      labels:
-        app: spring-demo
-    spec:
-      containers:
-        - name: spring-container
-          # [수정됨] buildspec.yml의 ECR 주소와 오하이오 리전을 적용했습니다 [web:57]
-          image: 416225317325.dkr.ecr.us-east-2.amazonaws.com/a081196_test:latest
-          ports:
-            - containerPort: 8080
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "512Mi"
-            limits:
-              cpu: "500m"
-              memory: "1Gi"
+version: 0.2
 
----
-# 2. 외부 접속 통로 설정 (Service)
-apiVersion: v1
-kind: Service
-metadata:
-  name: spring-demo-service
-spec:
-  type: LoadBalancer  # 오하이오 리전의 ELB가 자동으로 생성됩니다 [web:127][web:128]
-  selector:
-    app: spring-demo
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      # 1. AWS ECR 창고 문을 엽니다 (로그인)
+      # 주의: 제공해주신 주소의 리전인 'us-east-2'를 사용합니다.
+      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 416225317325.dkr.ecr.us-east-2.amazonaws.com
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      # 2. 이삿짐을 쌉니다 (Gradle 빌드 -> Docker 빌드)
+      - chmod +x ./gradlew
+      - ./gradlew clean build -x test
+      - docker build -t a081196_test .
+      # 3. 이삿짐에 주소표를 붙입니다 (태그 설정)
+      - docker tag a081196_test:latest 416225317325.dkr.ecr.us-east-2.amazonaws.com/a081196_test:latest
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      # 4. 창고로 짐을 보냅니다 (업로드)...
+      - docker push 416225317325.dkr.ecr.us-east-2.amazonaws.com/a081196_test:latest
