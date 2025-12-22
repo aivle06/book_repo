@@ -1,27 +1,18 @@
 version: 0.2
 
 phases:
-  pre_build:
+  install:
+    runtime-versions:
+      java: 17
     commands:
-      - echo Logging in to Amazon ECR...
-      # 1. AWS ECR 창고 문을 엽니다 (로그인)
-      # 주의: 제공해주신 주소의 리전인 'us-east-2'를 사용합니다.
-      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 416225317325.dkr.ecr.us-east-2.amazonaws.com
-
+      - chmod +x ./gradlew
   build:
     commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...
-      # 2. 이삿짐을 쌉니다 (Gradle 빌드 -> Docker 빌드)
-      - chmod +x ./gradlew
-      - ./gradlew clean build -x test
-      - docker build -t a081196_test .
-      # 3. 이삿짐에 주소표를 붙입니다 (태그 설정)
-      - docker tag a081196_test:latest 416225317325.dkr.ecr.us-east-2.amazonaws.com/a081196_test:latest
+      - ./gradlew build
 
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker image...
-      # 4. 창고로 짐을 보냅니다 (업로드)...
-      - docker push 416225317325.dkr.ecr.us-east-2.amazonaws.com/a081196_test:latest
+artifacts:
+  files:
+    - build/libs/*.jar
+    - appspec.yml
+    - scripts/**
+    - src/main/resources/static/** # <--- 이 줄 추가!
