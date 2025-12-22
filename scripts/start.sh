@@ -17,8 +17,8 @@ fi
 echo "> 새 애플리케이션 배포 시작"
 
 # build/libs 안까지 포함해서 jar 찾기
-JAR_NAME=$(find . -name "*.jar" ! -name "*plain.jar" | tail -n 1)
+JAR_NAME=$(ls /home/ec2-user/app/build/libs/*.jar | grep -v "plain" | tail -n 1)
 
 echo "> 실행할 JAR: $JAR_NAME"
 
-nohup java -jar $JAR_NAME > /home/ec2-user/app/nohup.out 2>&1 < /dev/null &
+nohup java -jar $JAR_NAME > /dev/null 2> /dev/null < /dev/null &
