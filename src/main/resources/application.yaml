@@ -10,5 +10,5 @@ spring:
       path: /h2-console # localhost:8080/h2-console
   jpa:
     hibernate:
-      ddl-auto: create #
+      ddl-auto: update #
       show-sql: true # what sql query is being mad
